@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://visionstream:visionstream@localhost:5432/visionstream"
-    cors_origins: str = "http://localhost:3000,http://localhost:80,http://localhost"
+    cors_origins: str = "http://localhost,http://localhost:80"
 
     @property
     def cors_origin_list(self) -> list[str]:

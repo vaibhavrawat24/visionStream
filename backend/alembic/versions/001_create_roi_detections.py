@@ -37,9 +37,11 @@ def upgrade() -> None:
     )
     op.create_index("ix_roi_detections_id", "roi_detections", ["id"])
     op.create_index("ix_roi_detections_session_id", "roi_detections", ["session_id"])
+    op.create_index("ix_roi_detections_detected_at", "roi_detections", ["detected_at"])
 
 
 def downgrade() -> None:
+    op.drop_index("ix_roi_detections_detected_at", table_name="roi_detections")
     op.drop_index("ix_roi_detections_session_id", table_name="roi_detections")
     op.drop_index("ix_roi_detections_id", table_name="roi_detections")
     op.drop_table("roi_detections")

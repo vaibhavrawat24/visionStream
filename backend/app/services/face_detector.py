@@ -5,6 +5,7 @@ Bounding-box rendering uses Pillow only.
 from __future__ import annotations
 
 import io
+import threading
 from dataclasses import dataclass
 from typing import Optional
 
@@ -15,6 +16,7 @@ from PIL import Image, ImageDraw, ImageFont
 # Initialise once at import time — MediaPipe models are loaded lazily.
 _mp_face = mp.solutions.face_detection
 _detector = _mp_face.FaceDetection(model_selection=0, min_detection_confidence=0.5)
+_detector_lock = threading.Lock()  # FaceDetection is not thread-safe
 
 ROI_COLOR = "#00FF41"  # matrix green
 ROI_WIDTH = 3
@@ -33,7 +35,8 @@ class FaceROI:
 def detect_face(image: Image.Image) -> Optional[FaceROI]:
     """Return the ROI for the first (and only assumed) face, or None."""
     rgb = np.array(image.convert("RGB"), dtype=np.uint8)
-    results = _detector.process(rgb)
+    with _detector_lock:
+        results = _detector.process(rgb)
 
     if not results.detections:
         return None

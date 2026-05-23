@@ -66,7 +66,7 @@ async def ws_stream(websocket: WebSocket) -> None:
                 )
 
                 # Throttled persistence
-                now = asyncio.get_event_loop().time()
+                now = asyncio.get_running_loop().time()
                 if now - last_db_write >= _DB_WRITE_INTERVAL:
                     last_db_write = now
                     asyncio.create_task(
