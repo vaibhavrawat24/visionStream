@@ -9,6 +9,7 @@ export default function VideoFeed({ onStatusChange, onRoiUpdate, onSessionId }) 
   const displayRef = useRef(null);      // visible — shows annotated frames
   const wsRef = useRef(null);
   const intervalRef = useRef(null);
+  const streamingRef = useRef(false);
 
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState(null);
@@ -25,6 +26,7 @@ export default function VideoFeed({ onStatusChange, onRoiUpdate, onSessionId }) 
       webcamRef.current.srcObject.getTracks().forEach((t) => t.stop());
       webcamRef.current.srcObject = null;
     }
+    streamingRef.current = false;
     setStreaming(false);
     onStatusChange("idle");
     onRoiUpdate(null);
@@ -49,6 +51,7 @@ export default function VideoFeed({ onStatusChange, onRoiUpdate, onSessionId }) 
 
     ws.onopen = () => {
       onStatusChange("streaming");
+      streamingRef.current = true;
       setStreaming(true);
 
       const canvas = canvasRef.current;
@@ -111,9 +114,9 @@ export default function VideoFeed({ onStatusChange, onRoiUpdate, onSessionId }) 
     };
 
     ws.onclose = () => {
-      if (streaming) stopStream();
+      if (streamingRef.current) stopStream();
     };
-  }, [onStatusChange, onRoiUpdate, onSessionId, stopStream, streaming]);
+  }, [onStatusChange, onRoiUpdate, onSessionId, stopStream]);
 
   // Cleanup on unmount
   useEffect(() => () => stopStream(), [stopStream]);
